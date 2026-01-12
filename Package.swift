@@ -26,7 +26,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "../swift-rfc-3492"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-3492.git", from: "0.0.1"),
     ],
     targets: [
         .target(
