@@ -21,24 +21,20 @@ let package = Package(
     ],
     products: [
         .library(
-            name: .rfc5890,
-            targets: [.rfc5890]
-        ),
+            name: "RFC 5890",
+            targets: ["RFC 5890"]
+        )
     ],
     dependencies: [
-        .package(path: "../swift-rfc-3492"),
+        .package(path: "../swift-rfc-3492")
     ],
     targets: [
         .target(
-            name: .rfc5890,
+            name: "RFC 5890",
             dependencies: [
-                .rfc3492,
+                .rfc3492
             ]
-        ),
-        .testTarget(
-            name: .rfc5890.tests,
-            dependencies: [.rfc5890]
-        ),
+        )
     ],
     swiftLanguageModes: [.v6]
 )
