@@ -65,7 +65,7 @@ extension IDNA {
     /// - Parameter input: Unicode domain name (U-label)
     /// - Returns: ASCII-compatible domain name (A-label)
     /// - Throws: `IDNA.Error` if conversion fails
-    public static func toASCII(_ input: String) throws -> String {
+    public static func toASCII(_ input: String) throws(Error) -> String {
         let labels = input.split(separator: ".", omittingEmptySubsequences: false)
         var asciiLabels: [String] = []
 
@@ -88,7 +88,7 @@ extension IDNA {
     /// - Parameter input: ASCII-compatible domain name (A-label)
     /// - Returns: Unicode domain name (U-label)
     /// - Throws: `IDNA.Error` if conversion fails
-    public static func toUnicode(_ input: String) throws -> String {
+    public static func toUnicode(_ input: String) throws(Error) -> String {
         let labels = input.split(separator: ".", omittingEmptySubsequences: false)
         var unicodeLabels: [String] = []
 
@@ -105,7 +105,7 @@ extension IDNA {
 
 extension IDNA {
     /// Converts a single label to ASCII form
-    private static func toLabelASCII(_ label: String) throws -> String {
+    private static func toLabelASCII(_ label: String) throws(Error) -> String {
         guard !label.isEmpty else {
             throw Error.emptyLabel
         }
@@ -138,7 +138,7 @@ extension IDNA {
     }
 
     /// Converts a single label from ASCII to Unicode form
-    private static func toLabelUnicode(_ label: String) throws -> String {
+    private static func toLabelUnicode(_ label: String) throws(Error) -> String {
         guard !label.isEmpty else {
             throw Error.emptyLabel
         }
