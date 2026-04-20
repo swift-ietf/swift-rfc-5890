@@ -18,8 +18,8 @@ import Testing
 struct IDNATests {
     // MARK: - ToASCII Tests
 
-    @Test("ToASCII: German domain")
-    func testToASCIIGerman() throws {
+    @Test
+    func `ToASCII: German domain`() throws {
         let input = "münchen.de"
         let expected = "xn--mnchen-3ya.de"
 
@@ -27,8 +27,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Japanese domain")
-    func testToASCIIJapanese() throws {
+    @Test
+    func `ToASCII: Japanese domain`() throws {
         let input = "日本.jp"
         let expected = "xn--wgv71a.jp"
 
@@ -36,8 +36,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Chinese domain")
-    func testToASCIIChinese() throws {
+    @Test
+    func `ToASCII: Chinese domain`() throws {
         let input = "中国.cn"
         let expected = "xn--fiqs8s.cn"
 
@@ -45,8 +45,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Arabic domain")
-    func testToASCIIArabic() throws {
+    @Test
+    func `ToASCII: Arabic domain`() throws {
         let input = "مصر.eg"
         let expected = "xn--wgbh1c.eg"
 
@@ -64,8 +64,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Russian domain")
-    func testToASCIIRussian() throws {
+    @Test
+    func `ToASCII: Russian domain`() throws {
         let input = "россия.ru"
         let expected = "xn--h1alffa9f.ru"
 
@@ -73,8 +73,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Korean domain")
-    func testToASCIIKorean() throws {
+    @Test
+    func `ToASCII: Korean domain`() throws {
         let input = "한국.kr"
         let expected = "xn--3e0b707e.kr"
 
@@ -82,8 +82,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Mixed ASCII and non-ASCII")
-    func testToASCIIMixed() throws {
+    @Test
+    func `ToASCII: Mixed ASCII and non-ASCII`() throws {
         let input = "www.münchen.example.com"
         let expected = "www.xn--mnchen-3ya.example.com"
 
@@ -91,8 +91,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Already ASCII")
-    func testToASCIIAlreadyASCII() throws {
+    @Test
+    func `ToASCII: Already ASCII`() throws {
         let input = "example.com"
         let expected = "example.com"
 
@@ -100,8 +100,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Uppercase to lowercase")
-    func testToASCIIUppercase() throws {
+    @Test
+    func `ToASCII: Uppercase to lowercase`() throws {
         let input = "Example.COM"
         let expected = "example.com"
 
@@ -122,8 +122,8 @@ struct IDNATests {
 
     // MARK: - ToUnicode Tests
 
-    @Test("ToUnicode: German A-label")
-    func testToUnicodeGerman() throws {
+    @Test
+    func `ToUnicode: German A-label`() throws {
         let input = "xn--mnchen-3ya.de"
         let expected = "münchen.de"
 
@@ -131,8 +131,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToUnicode: Japanese A-label")
-    func testToUnicodeJapanese() throws {
+    @Test
+    func `ToUnicode: Japanese A-label`() throws {
         let input = "xn--wgv71a.jp"
         let expected = "日本.jp"
 
@@ -140,8 +140,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToUnicode: Chinese A-label")
-    func testToUnicodeChinese() throws {
+    @Test
+    func `ToUnicode: Chinese A-label`() throws {
         let input = "xn--fiqs8s.cn"
         let expected = "中国.cn"
 
@@ -149,8 +149,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToUnicode: Mixed A-labels and ASCII")
-    func testToUnicodeMixed() throws {
+    @Test
+    func `ToUnicode: Mixed A-labels and ASCII`() throws {
         let input = "www.xn--mnchen-3ya.example.com"
         let expected = "www.münchen.example.com"
 
@@ -158,8 +158,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToUnicode: Already Unicode")
-    func testToUnicodeAlreadyUnicode() throws {
+    @Test
+    func `ToUnicode: Already Unicode`() throws {
         let input = "example.com"
         let expected = "example.com"
 
@@ -167,8 +167,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToUnicode: Uppercase A-label prefix")
-    func testToUnicodeUppercasePrefix() throws {
+    @Test
+    func `ToUnicode: Uppercase A-label prefix`() throws {
         let input = "XN--MNCHEN-3YA.DE"
         let expected = "münchen.de"
 
@@ -178,8 +178,8 @@ struct IDNATests {
 
     // MARK: - Round-trip Tests
 
-    @Test("Round-trip: German")
-    func testRoundTripGerman() throws {
+    @Test
+    func `Round-trip: German`() throws {
         let original = "münchen.de"
 
         let ascii = try IDNA.toASCII(original)
@@ -188,8 +188,8 @@ struct IDNATests {
         #expect(unicode == original)
     }
 
-    @Test("Round-trip: Japanese")
-    func testRoundTripJapanese() throws {
+    @Test
+    func `Round-trip: Japanese`() throws {
         let original = "日本語.jp"
 
         let ascii = try IDNA.toASCII(original)
@@ -198,8 +198,8 @@ struct IDNATests {
         #expect(unicode == original)
     }
 
-    @Test("Round-trip: Multiple non-ASCII labels")
-    func testRoundTripMultiple() throws {
+    @Test
+    func `Round-trip: Multiple non-ASCII labels`() throws {
         let original = "münchen.café.example.日本"
 
         let ascii = try IDNA.toASCII(original)
@@ -208,8 +208,8 @@ struct IDNATests {
         #expect(unicode == original)
     }
 
-    @Test("Round-trip: ASCII domain")
-    func testRoundTripASCII() throws {
+    @Test
+    func `Round-trip: ASCII domain`() throws {
         let original = "example.com"
 
         let ascii = try IDNA.toASCII(original)
@@ -220,57 +220,57 @@ struct IDNATests {
 
     // MARK: - Label Validation Tests
 
-    @Test("isALabel: Valid A-label")
-    func testIsALabelValid() {
+    @Test
+    func `isALabel: Valid A-label`() {
         #expect(IDNA.isALabel("xn--mnchen-3ya"))
         #expect(IDNA.isALabel("xn--wgv71a"))
         #expect(IDNA.isALabel("XN--MNCHEN-3YA"))
     }
 
-    @Test("isALabel: Not an A-label")
-    func testIsALabelInvalid() {
+    @Test
+    func `isALabel: Not an A-label`() {
         #expect(!IDNA.isALabel("example"))
         #expect(!IDNA.isALabel("münchen"))
         #expect(!IDNA.isALabel("xn-test"))
     }
 
-    @Test("isULabel: Valid U-label")
-    func testIsULabelValid() {
+    @Test
+    func `isULabel: Valid U-label`() {
         #expect(IDNA.isULabel("münchen"))
         #expect(IDNA.isULabel("日本"))
         #expect(IDNA.isULabel("café"))
     }
 
-    @Test("isULabel: Not a U-label")
-    func testIsULabelInvalid() {
+    @Test
+    func `isULabel: Not a U-label`() {
         #expect(!IDNA.isULabel("example"))
         #expect(!IDNA.isULabel("xn--mnchen-3ya"))
     }
 
-    @Test("isNRLDHLabel: Valid NR-LDH label")
-    func testIsNRLDHLabelValid() {
+    @Test
+    func `isNRLDHLabel: Valid NR-LDH label`() {
         #expect(IDNA.isNRLDHLabel("example"))
         #expect(IDNA.isNRLDHLabel("test-123"))
         #expect(IDNA.isNRLDHLabel("com"))
     }
 
-    @Test("isNRLDHLabel: Not an NR-LDH label")
-    func testIsNRLDHLabelInvalid() {
+    @Test
+    func `isNRLDHLabel: Not an NR-LDH label`() {
         #expect(!IDNA.isNRLDHLabel("münchen"))
         #expect(!IDNA.isNRLDHLabel("xn--mnchen-3ya"))
     }
 
     // MARK: - Error Tests
 
-    @Test("ToASCII: Empty label")
-    func testToASCIIEmptyLabel() {
+    @Test
+    func `ToASCII: Empty label`() {
         #expect(throws: IDNA.Error.emptyLabel) {
             try IDNA.toASCII("")
         }
     }
 
-    @Test("ToASCII: Label too long")
-    func testToASCIILabelTooLong() {
+    @Test
+    func `ToASCII: Label too long`() {
         // Create a label that will exceed 63 octets after encoding
         // Use a long string of diverse characters to ensure Punycode output exceeds limit
         let longLabel = String(repeating: "日本語", count: 25)  // 75 characters
@@ -280,15 +280,15 @@ struct IDNATests {
         }
     }
 
-    @Test("ToUnicode: Invalid Punycode")
-    func testToUnicodeInvalidPunycode() {
+    @Test
+    func `ToUnicode: Invalid Punycode`() {
         #expect(throws: IDNA.Error.punycodeError) {
             try IDNA.toUnicode("xn--invalid!!!")
         }
     }
 
-    @Test("ToUnicode: Empty label")
-    func testToUnicodeEmptyLabel() {
+    @Test
+    func `ToUnicode: Empty label`() {
         #expect(throws: IDNA.Error.emptyLabel) {
             try IDNA.toUnicode("")
         }
@@ -296,8 +296,8 @@ struct IDNATests {
 
     // MARK: - Real-world Domains
 
-    @Test("Real-world: Internationalized TLDs")
-    func testInternationalizedTLDs() throws {
+    @Test
+    func `Real-world: Internationalized TLDs`() throws {
         // .भारत (India in Devanagari)
         let india = "example.भारत"
         let indiaASCII = try IDNA.toASCII(india)
@@ -314,8 +314,8 @@ struct IDNATests {
         #expect(russiaASCII.hasSuffix(".xn--p1ai"))
     }
 
-    @Test("Real-world: Popular internationalized domains")
-    func testPopularInternationalizedDomains() throws {
+    @Test
+    func `Real-world: Popular internationalized domains`() throws {
         let domains = [
             ("bücher.de", "xn--bcher-kva.de"),
             ("naïve.com", "xn--nave-6pa.com"),
