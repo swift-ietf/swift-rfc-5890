@@ -33,7 +33,9 @@ import RFC_3492
 /// let unicode = try IDNA.toUnicode("xn--mnchen-3ya.de")
 /// // Result: "münchen.de"
 /// ```
-public enum IDNA {
+public enum IDNA {}
+
+extension IDNA {
     /// ACE (ASCII Compatible Encoding) prefix for A-labels
     public static let acePrefix = "xn--"
 
