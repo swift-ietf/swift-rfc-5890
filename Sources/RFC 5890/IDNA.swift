@@ -153,19 +153,20 @@ extension IDNA {
             let punycodePart = String(lowercased[punycodeStart...])
 
             // Decode Punycode
+            let decoded: String
             do throws(Punycode.Error) {
-                let decoded = try Punycode.decode(punycodePart)
-
-                // Validate U-label length
-                guard decoded.unicodeScalars.count <= maxULabelLength else {
-                    throw Error.labelTooLong
-                }
-
-                // TODO: Implement NFC normalization per IDNA2008 requirements
-                return decoded
+                decoded = try Punycode.decode(punycodePart)
             } catch {
                 throw Error.punycodeError
             }
+
+            // Validate U-label length
+            guard decoded.unicodeScalars.count <= maxULabelLength else {
+                throw Error.labelTooLong
+            }
+
+            // TODO: Implement NFC normalization per IDNA2008 requirements
+            return decoded
         }
 
         // Not an A-label - return as-is (NR-LDH label)
