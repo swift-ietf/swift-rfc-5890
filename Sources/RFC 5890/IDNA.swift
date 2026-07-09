@@ -153,7 +153,7 @@ extension IDNA {
             let punycodePart = String(lowercased[punycodeStart...])
 
             // Decode Punycode
-            do {
+            do throws(Punycode.Error) {
                 let decoded = try Punycode.decode(punycodePart)
 
                 // Validate U-label length
