@@ -15,7 +15,9 @@ import Testing
 @testable import RFC_5890
 
 /// Tests for IDNA2008 per RFC 5890
-struct IDNATests {
+struct IDNATests {}
+
+extension IDNATests {
     // MARK: - ToASCII Tests
 
     @Test
@@ -54,8 +56,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: Greek domain", .disabled("NFC normalization not yet implemented"))
-    func testToASCIIGreek() throws {
+    @Test(.disabled("NFC normalization not yet implemented"))
+    func `ToASCII: Greek domain`() throws {
         // NOTE: Greek accented characters require NFC normalization
         let input = "ελλάδα.gr"
         let expected = "xn--qxam.gr"
@@ -109,8 +111,8 @@ struct IDNATests {
         #expect(result == expected)
     }
 
-    @Test("ToASCII: NFC normalization", .disabled("NFC normalization not yet implemented"))
-    func testToASCIINormalization() throws {
+    @Test(.disabled("NFC normalization not yet implemented"))
+    func `ToASCII: NFC normalization`() throws {
         // NOTE: This test requires NFC normalization, which we haven't implemented yet
         // Using decomposed form (é as e + combining acute)
         let input = "caf\u{0065}\u{0301}.com"  // café with decomposed é
