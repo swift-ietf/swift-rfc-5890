@@ -15,7 +15,7 @@ Add the package to your `Package.swift` dependencies:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-ietf/swift-rfc-5890.git", from: "0.1.2")
+    .package(url: "https://github.com/swift-ietf/swift-rfc-5890.git", branch: "main")
 ]
 ```
 
