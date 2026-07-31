@@ -44,15 +44,6 @@ extension IDNA {
 
     /// Maximum length of a U-label in code points
     public static let maxULabelLength = 252
-
-    /// Errors that can occur during IDNA processing
-    public enum Error: Swift.Error, Equatable {
-        case emptyLabel
-        case labelTooLong
-        case invalidLabel
-        case punycodeError
-        case invalidACEPrefix
-    }
 }
 
 extension IDNA {
@@ -161,6 +152,9 @@ extension IDNA {
             }
 
             // Validate U-label length
+            // swift-linter:disable:next string utf8 scanning
+            // REASON: maxULabelLength is an RFC 5890 code-point count, not a byte count;
+            // `.utf8` would measure UTF-8 octets and misvalidate multi-byte scalars.
             guard decoded.unicodeScalars.count <= maxULabelLength else {
                 throw Error.labelTooLong
             }
