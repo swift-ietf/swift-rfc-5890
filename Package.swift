@@ -17,7 +17,7 @@ let package = Package(
         .macOS(.v26),
         .iOS(.v26),
         .tvOS(.v26),
-        .watchOS(.v26)
+        .watchOS(.v26),
     ],
     products: [
         .library(
@@ -38,7 +38,7 @@ let package = Package(
         .testTarget(
             name: "RFC 5890 Tests",
             dependencies: [
-                "RFC 5890",
+                "RFC 5890"
             ]
         ),
     ],
