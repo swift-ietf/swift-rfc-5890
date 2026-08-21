@@ -1,24 +1,10 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_5890
 
-/// Tests for IDNA2008 per RFC 5890
 struct IDNATests {}
 
 extension IDNATests {
-    // MARK: - ToASCII Tests
 
     @Test
     func `ToASCII: German domain`() throws {
@@ -58,7 +44,7 @@ extension IDNATests {
 
     @Test(.disabled("NFC normalization not yet implemented"))
     func `ToASCII: Greek domain`() throws {
-        // NOTE: Greek accented characters require NFC normalization
+
         let input = "ελλάδα.gr"
         let expected = "xn--qxam.gr"
 
@@ -113,16 +99,13 @@ extension IDNATests {
 
     @Test(.disabled("NFC normalization not yet implemented"))
     func `ToASCII: NFC normalization`() throws {
-        // NOTE: This test requires NFC normalization, which we haven't implemented yet
-        // Using decomposed form (é as e + combining acute)
-        let input = "caf\u{0065}\u{0301}.com"  // café with decomposed é
-        let expected = "xn--caf-dma.com"  // Should normalize to NFC
+
+        let input = "caf\u{0065}\u{0301}.com"
+        let expected = "xn--caf-dma.com"
 
         let result = try IDNA.toASCII(input)
         #expect(result == expected)
     }
-
-    // MARK: - ToUnicode Tests
 
     @Test
     func `ToUnicode: German A-label`() throws {
@@ -178,8 +161,6 @@ extension IDNATests {
         #expect(result == expected)
     }
 
-    // MARK: - Round-trip Tests
-
     @Test
     func `Round-trip: German`() throws {
         let original = "münchen.de"
@@ -219,8 +200,6 @@ extension IDNATests {
 
         #expect(unicode == original)
     }
-
-    // MARK: - Label Validation Tests
 
     @Test
     func `isALabel: Valid A-label`() {
@@ -262,8 +241,6 @@ extension IDNATests {
         #expect(!IDNA.isNRLDHLabel("xn--mnchen-3ya"))
     }
 
-    // MARK: - Error Tests
-
     @Test
     func `ToASCII: Empty label`() {
         #expect(throws: IDNA.Error.emptyLabel) {
@@ -273,9 +250,8 @@ extension IDNATests {
 
     @Test
     func `ToASCII: Label too long`() {
-        // Create a label that will exceed 63 octets after encoding
-        // Use a long string of diverse characters to ensure Punycode output exceeds limit
-        let longLabel = String(repeating: "日本語", count: 25)  // 75 characters
+
+        let longLabel = String(repeating: "日本語", count: 25)
 
         #expect(throws: IDNA.Error.labelTooLong) {
             try IDNA.toASCII(longLabel)
@@ -296,21 +272,17 @@ extension IDNATests {
         }
     }
 
-    // MARK: - Real-world Domains
-
     @Test
     func `Real-world: Internationalized TLDs`() throws {
-        // .भारत (India in Devanagari)
+
         let india = "example.भारत"
         let indiaASCII = try IDNA.toASCII(india)
         #expect(indiaASCII.hasSuffix(".xn--h2brj9c"))
 
-        // .中国 (China)
         let china = "example.中国"
         let chinaASCII = try IDNA.toASCII(china)
         #expect(chinaASCII.hasSuffix(".xn--fiqs8s"))
 
-        // .рф (Russia)
         let russia = "example.рф"
         let russiaASCII = try IDNA.toASCII(russia)
         #expect(russiaASCII.hasSuffix(".xn--p1ai"))
