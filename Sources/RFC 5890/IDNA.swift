@@ -7,8 +7,6 @@ extension IDNA {
     public static let acePrefix = "xn--"
 
     public static let maxLabelLength = 63
-
-    public static let maxULabelLength = 252
 }
 
 extension IDNA {
@@ -83,6 +81,10 @@ extension IDNA {
         let lowercased = label.lowercased()
         if lowercased.hasPrefix(acePrefix) {
 
+            guard lowercased.utf8.count <= maxLabelLength else {
+                throw Error.labelTooLong
+            }
+
             let punycodeStart = lowercased.index(lowercased.startIndex, offsetBy: acePrefix.count)
             let punycodePart = String(lowercased[punycodeStart...])
 
@@ -95,10 +97,6 @@ extension IDNA {
                 decoded = try Punycode.decode(punycodePart)
             } catch {
                 throw Error.punycodeError
-            }
-
-            guard decoded.unicodeScalars.count <= maxULabelLength else {
-                throw Error.labelTooLong
             }
 
             let reencoded: String

@@ -174,6 +174,13 @@ extension IDNA.Test.Unit {
 extension IDNA.Test.`Edge Case` {
 
     @Test
+    func `RFC 5890 §2.3.2.1: ToUnicode checks the 63-octet A-label bound before decoding`() {
+        #expect(throws: IDNA.Error.labelTooLong) {
+            try IDNA.toUnicode("xn--" + String(repeating: "!", count: 60))
+        }
+    }
+
+    @Test
     func `RFC 5891 §5.3: ToUnicode rejects a fake A-label that encodes pure ASCII`() {
         #expect(throws: IDNA.Error.invalidLabel) {
             try IDNA.toUnicode("xn--abc-.example")
