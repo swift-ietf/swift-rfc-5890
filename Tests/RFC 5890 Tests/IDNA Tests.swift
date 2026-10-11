@@ -2,9 +2,16 @@ import Testing
 
 @testable import RFC_5890
 
-struct IDNATests {}
+extension IDNA {
+    @Suite
+    struct Test {
+        @Suite struct Unit {}
+        @Suite struct `Edge Case` {}
+        @Suite struct Integration {}
+    }
+}
 
-extension IDNATests {
+extension IDNA.Test.Unit {
 
     @Test
     func `ToASCII: German domain`() throws {
@@ -42,16 +49,6 @@ extension IDNATests {
         #expect(result == expected)
     }
 
-    @Test(.disabled("NFC normalization not yet implemented"))
-    func `ToASCII: Greek domain`() throws {
-
-        let input = "ελλάδα.gr"
-        let expected = "xn--qxam.gr"
-
-        let result = try IDNA.toASCII(input)
-        #expect(result == expected)
-    }
-
     @Test
     func `ToASCII: Russian domain`() throws {
         let input = "россия.ru"
@@ -83,25 +80,6 @@ extension IDNATests {
     func `ToASCII: Already ASCII`() throws {
         let input = "example.com"
         let expected = "example.com"
-
-        let result = try IDNA.toASCII(input)
-        #expect(result == expected)
-    }
-
-    @Test
-    func `ToASCII: Uppercase to lowercase`() throws {
-        let input = "Example.COM"
-        let expected = "example.com"
-
-        let result = try IDNA.toASCII(input)
-        #expect(result == expected)
-    }
-
-    @Test(.disabled("NFC normalization not yet implemented"))
-    func `ToASCII: NFC normalization`() throws {
-
-        let input = "caf\u{0065}\u{0301}.com"
-        let expected = "xn--caf-dma.com"
 
         let result = try IDNA.toASCII(input)
         #expect(result == expected)
@@ -153,6 +131,78 @@ extension IDNATests {
     }
 
     @Test
+    func `isALabel: Valid A-label`() {
+        #expect(IDNA.isALabel("xn--mnchen-3ya"))
+        #expect(IDNA.isALabel("xn--wgv71a"))
+        #expect(IDNA.isALabel("XN--MNCHEN-3YA"))
+    }
+
+    @Test
+    func `isALabel: Not an A-label`() {
+        #expect(!IDNA.isALabel("example"))
+        #expect(!IDNA.isALabel("münchen"))
+        #expect(!IDNA.isALabel("xn-test"))
+    }
+
+    @Test
+    func `isULabel: Valid U-label`() {
+        #expect(IDNA.isULabel("münchen"))
+        #expect(IDNA.isULabel("日本"))
+        #expect(IDNA.isULabel("café"))
+    }
+
+    @Test
+    func `isULabel: Not a U-label`() {
+        #expect(!IDNA.isULabel("example"))
+        #expect(!IDNA.isULabel("xn--mnchen-3ya"))
+    }
+
+    @Test
+    func `isNRLDHLabel: Valid NR-LDH label`() {
+        #expect(IDNA.isNRLDHLabel("example"))
+        #expect(IDNA.isNRLDHLabel("test-123"))
+        #expect(IDNA.isNRLDHLabel("com"))
+    }
+
+    @Test
+    func `isNRLDHLabel: Not an NR-LDH label`() {
+        #expect(!IDNA.isNRLDHLabel("münchen"))
+        #expect(!IDNA.isNRLDHLabel("xn--mnchen-3ya"))
+    }
+}
+
+extension IDNA.Test.`Edge Case` {
+
+    @Test(.disabled("NFC normalization not yet implemented"))
+    func `ToASCII: Greek domain`() throws {
+
+        let input = "ελλάδα.gr"
+        let expected = "xn--qxam.gr"
+
+        let result = try IDNA.toASCII(input)
+        #expect(result == expected)
+    }
+
+    @Test
+    func `ToASCII: Uppercase to lowercase`() throws {
+        let input = "Example.COM"
+        let expected = "example.com"
+
+        let result = try IDNA.toASCII(input)
+        #expect(result == expected)
+    }
+
+    @Test(.disabled("NFC normalization not yet implemented"))
+    func `ToASCII: NFC normalization`() throws {
+
+        let input = "caf\u{0065}\u{0301}.com"
+        let expected = "xn--caf-dma.com"
+
+        let result = try IDNA.toASCII(input)
+        #expect(result == expected)
+    }
+
+    @Test
     func `ToUnicode: Uppercase A-label prefix`() throws {
         let input = "XN--MNCHEN-3YA.DE"
         let expected = "münchen.de"
@@ -160,6 +210,40 @@ extension IDNATests {
         let result = try IDNA.toUnicode(input)
         #expect(result == expected)
     }
+
+    @Test
+    func `ToASCII: Empty label`() {
+        #expect(throws: IDNA.Error.emptyLabel) {
+            try IDNA.toASCII("")
+        }
+    }
+
+    @Test
+    func `ToASCII: Label too long`() {
+
+        let longLabel = String(repeating: "日本語", count: 25)
+
+        #expect(throws: IDNA.Error.labelTooLong) {
+            try IDNA.toASCII(longLabel)
+        }
+    }
+
+    @Test
+    func `ToUnicode: Invalid Punycode`() {
+        #expect(throws: IDNA.Error.punycodeError) {
+            try IDNA.toUnicode("xn--invalid!!!")
+        }
+    }
+
+    @Test
+    func `ToUnicode: Empty label`() {
+        #expect(throws: IDNA.Error.emptyLabel) {
+            try IDNA.toUnicode("")
+        }
+    }
+}
+
+extension IDNA.Test.Integration {
 
     @Test
     func `Round-trip: German`() throws {
@@ -199,77 +283,6 @@ extension IDNATests {
         let unicode = try IDNA.toUnicode(ascii)
 
         #expect(unicode == original)
-    }
-
-    @Test
-    func `isALabel: Valid A-label`() {
-        #expect(IDNA.isALabel("xn--mnchen-3ya"))
-        #expect(IDNA.isALabel("xn--wgv71a"))
-        #expect(IDNA.isALabel("XN--MNCHEN-3YA"))
-    }
-
-    @Test
-    func `isALabel: Not an A-label`() {
-        #expect(!IDNA.isALabel("example"))
-        #expect(!IDNA.isALabel("münchen"))
-        #expect(!IDNA.isALabel("xn-test"))
-    }
-
-    @Test
-    func `isULabel: Valid U-label`() {
-        #expect(IDNA.isULabel("münchen"))
-        #expect(IDNA.isULabel("日本"))
-        #expect(IDNA.isULabel("café"))
-    }
-
-    @Test
-    func `isULabel: Not a U-label`() {
-        #expect(!IDNA.isULabel("example"))
-        #expect(!IDNA.isULabel("xn--mnchen-3ya"))
-    }
-
-    @Test
-    func `isNRLDHLabel: Valid NR-LDH label`() {
-        #expect(IDNA.isNRLDHLabel("example"))
-        #expect(IDNA.isNRLDHLabel("test-123"))
-        #expect(IDNA.isNRLDHLabel("com"))
-    }
-
-    @Test
-    func `isNRLDHLabel: Not an NR-LDH label`() {
-        #expect(!IDNA.isNRLDHLabel("münchen"))
-        #expect(!IDNA.isNRLDHLabel("xn--mnchen-3ya"))
-    }
-
-    @Test
-    func `ToASCII: Empty label`() {
-        #expect(throws: IDNA.Error.emptyLabel) {
-            try IDNA.toASCII("")
-        }
-    }
-
-    @Test
-    func `ToASCII: Label too long`() {
-
-        let longLabel = String(repeating: "日本語", count: 25)
-
-        #expect(throws: IDNA.Error.labelTooLong) {
-            try IDNA.toASCII(longLabel)
-        }
-    }
-
-    @Test
-    func `ToUnicode: Invalid Punycode`() {
-        #expect(throws: IDNA.Error.punycodeError) {
-            try IDNA.toUnicode("xn--invalid!!!")
-        }
-    }
-
-    @Test
-    func `ToUnicode: Empty label`() {
-        #expect(throws: IDNA.Error.emptyLabel) {
-            try IDNA.toUnicode("")
-        }
     }
 
     @Test
