@@ -30,7 +30,8 @@ let package = Package(
         .testTarget(
             name: "RFC 5890 Tests",
             dependencies: [
-                .target(name: "RFC 5890")
+                .target(name: "RFC 5890"),
+                .product(name: "RFC 3492", package: "swift-rfc-3492"),
             ]
         ),
     ],

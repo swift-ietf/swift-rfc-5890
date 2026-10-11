@@ -1,5 +1,6 @@
 import Testing
 
+import RFC_3492
 @testable import RFC_5890
 
 extension IDNA {
@@ -307,8 +308,8 @@ extension IDNA.Test.`Edge Case` {
     }
 
     @Test
-    func `ToUnicode: Invalid Punycode`() {
-        #expect(throws: IDNA.Error.punycodeError) {
+    func `RFC 3492 §6.2: ToUnicode reports the Punycode decoding failure`() {
+        #expect(throws: IDNA.Error.punycodeError(.badInput)) {
             try IDNA.toUnicode("xn--invalid!!!")
         }
     }

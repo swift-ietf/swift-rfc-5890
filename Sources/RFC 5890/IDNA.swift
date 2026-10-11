@@ -96,7 +96,7 @@ extension IDNA {
             do throws(Punycode.Error) {
                 decoded = try Punycode.decode(punycodePart)
             } catch {
-                throw Error.punycodeError
+                throw Error.punycodeError(error)
             }
 
             let reencoded: String
