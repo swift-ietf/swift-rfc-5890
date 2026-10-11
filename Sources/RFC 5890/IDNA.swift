@@ -54,7 +54,7 @@ extension IDNA {
             throw Error.emptyLabel
         }
 
-        let normalized = label
+        let normalized = String(decoding: label._nfcCodeUnits, as: UTF8.self)
 
         if normalized.allSatisfy({ $0.isASCII }) {
 

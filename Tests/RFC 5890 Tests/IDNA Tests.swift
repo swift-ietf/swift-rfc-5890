@@ -174,6 +174,20 @@ extension IDNA.Test.Unit {
 extension IDNA.Test.`Edge Case` {
 
     @Test
+    func `RFC 5890 §2.3.2.1: ToASCII yields the same A-label for canonically equivalent U-labels`() throws {
+        let precomposed = try IDNA.toASCII("\u{03B5}\u{03BB}\u{03BB}\u{03AC}\u{03B4}\u{03B1}")
+        let decomposed = try IDNA.toASCII("\u{03B5}\u{03BB}\u{03BB}\u{03B1}\u{0301}\u{03B4}\u{03B1}")
+        #expect(precomposed == "xn--hxakic4aa")
+        #expect(decomposed == precomposed)
+    }
+
+    @Test
+    func `RFC 5890 §2.3.2.1: ToUnicode output of an NFC A-label is in NFC`() throws {
+        let unicode = try IDNA.toUnicode(IDNA.toASCII("cafe\u{0301}"))
+        #expect(Array(unicode.unicodeScalars) == Array("caf\u{00E9}".unicodeScalars))
+    }
+
+    @Test
     func `RFC 1034 §3.1: ToASCII preserves the root label of an absolute domain name`() throws {
         #expect(try IDNA.toASCII("münchen.de.") == "xn--mnchen-3ya.de.")
         #expect(try IDNA.toASCII("Example.COM.") == "example.com.")
@@ -199,11 +213,10 @@ extension IDNA.Test.`Edge Case` {
     }
 
 
-    @Test(.disabled("NFC normalization not yet implemented"))
+    @Test
     func `ToASCII: Greek domain`() throws {
-
         let input = "ελλάδα.gr"
-        let expected = "xn--qxam.gr"
+        let expected = "xn--hxakic4aa.gr"
 
         let result = try IDNA.toASCII(input)
         #expect(result == expected)
@@ -218,9 +231,8 @@ extension IDNA.Test.`Edge Case` {
         #expect(result == expected)
     }
 
-    @Test(.disabled("NFC normalization not yet implemented"))
-    func `ToASCII: NFC normalization`() throws {
-
+    @Test
+    func `RFC 5890 §2.3.2.1: ToASCII normalizes a decomposed U-label to NFC`() throws {
         let input = "caf\u{0065}\u{0301}.com"
         let expected = "xn--caf-dma.com"
 
