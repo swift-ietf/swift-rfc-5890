@@ -14,7 +14,7 @@ extension IDNA {
 extension IDNA {
 
     public static func toASCII(_ input: String) throws(Error) -> String {
-        let labels = input.split(separator: ".", omittingEmptySubsequences: false)
+        let (labels, isAbsolute) = split(input)
         var asciiLabels: [String] = []
 
         for label in labels {
@@ -22,11 +22,11 @@ extension IDNA {
             asciiLabels.append(asciiLabel)
         }
 
-        return asciiLabels.joined(separator: ".")
+        return asciiLabels.joined(separator: ".") + (isAbsolute ? "." : "")
     }
 
     public static func toUnicode(_ input: String) throws(Error) -> String {
-        let labels = input.split(separator: ".", omittingEmptySubsequences: false)
+        let (labels, isAbsolute) = split(input)
         var unicodeLabels: [String] = []
 
         for label in labels {
@@ -34,7 +34,16 @@ extension IDNA {
             unicodeLabels.append(unicodeLabel)
         }
 
-        return unicodeLabels.joined(separator: ".")
+        return unicodeLabels.joined(separator: ".") + (isAbsolute ? "." : "")
+    }
+
+    private static func split(_ input: String) -> (labels: [Substring], isAbsolute: Bool) {
+        var labels = input.split(separator: ".", omittingEmptySubsequences: false)
+        guard labels.count > 1, labels.last?.isEmpty == true else {
+            return (labels, false)
+        }
+        labels.removeLast()
+        return (labels, true)
     }
 }
 

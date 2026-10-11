@@ -173,6 +173,32 @@ extension IDNA.Test.Unit {
 
 extension IDNA.Test.`Edge Case` {
 
+    @Test
+    func `RFC 1034 §3.1: ToASCII preserves the root label of an absolute domain name`() throws {
+        #expect(try IDNA.toASCII("münchen.de.") == "xn--mnchen-3ya.de.")
+        #expect(try IDNA.toASCII("Example.COM.") == "example.com.")
+    }
+
+    @Test
+    func `RFC 1034 §3.1: ToUnicode preserves the root label of an absolute domain name`() throws {
+        #expect(try IDNA.toUnicode("xn--mnchen-3ya.de.") == "münchen.de.")
+        #expect(try IDNA.toUnicode("example.com.") == "example.com.")
+    }
+
+    @Test
+    func `RFC 1034 §3.1: Only the final label may be the empty root label`() {
+        #expect(throws: IDNA.Error.emptyLabel) {
+            try IDNA.toASCII("example..com")
+        }
+        #expect(throws: IDNA.Error.emptyLabel) {
+            try IDNA.toASCII(".")
+        }
+        #expect(throws: IDNA.Error.emptyLabel) {
+            try IDNA.toUnicode("example.com..")
+        }
+    }
+
+
     @Test(.disabled("NFC normalization not yet implemented"))
     func `ToASCII: Greek domain`() throws {
 
