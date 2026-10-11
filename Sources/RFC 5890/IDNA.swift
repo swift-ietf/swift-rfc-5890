@@ -86,6 +86,10 @@ extension IDNA {
             let punycodeStart = lowercased.index(lowercased.startIndex, offsetBy: acePrefix.count)
             let punycodePart = String(lowercased[punycodeStart...])
 
+            guard !punycodePart.isEmpty else {
+                throw Error.invalidACEPrefix
+            }
+
             let decoded: String
             do throws(Punycode.Error) {
                 decoded = try Punycode.decode(punycodePart)
@@ -95,6 +99,19 @@ extension IDNA {
 
             guard decoded.unicodeScalars.count <= maxULabelLength else {
                 throw Error.labelTooLong
+            }
+
+            let reencoded: String
+            do throws(Error) {
+                reencoded = try toLabelASCII(decoded)
+            } catch .labelTooLong {
+                throw Error.labelTooLong
+            } catch {
+                throw Error.invalidLabel
+            }
+
+            guard reencoded == lowercased else {
+                throw Error.invalidLabel
             }
 
             return decoded

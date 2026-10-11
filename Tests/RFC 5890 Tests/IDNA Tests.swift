@@ -174,6 +174,39 @@ extension IDNA.Test.Unit {
 extension IDNA.Test.`Edge Case` {
 
     @Test
+    func `RFC 5891 §5.3: ToUnicode rejects a fake A-label that encodes pure ASCII`() {
+        #expect(throws: IDNA.Error.invalidLabel) {
+            try IDNA.toUnicode("xn--abc-.example")
+        }
+    }
+
+    @Test
+    func `RFC 5891 §5.3: ToUnicode rejects an A-label whose U-label is not in NFC`() {
+        #expect(throws: IDNA.Error.invalidLabel) {
+            try IDNA.toUnicode("xn--cafe-yvc.com")
+        }
+    }
+
+    @Test
+    func `RFC 5891 §5.3: ToUnicode rejects an ACE prefix without a Punycode payload`() {
+        #expect(throws: IDNA.Error.invalidACEPrefix) {
+            try IDNA.toUnicode("xn--.example")
+        }
+    }
+
+    @Test
+    func `RFC 5890 §2.3.2.1: ToUnicode rejects an A-label longer than 63 octets`() {
+        #expect(throws: IDNA.Error.labelTooLong) {
+            try IDNA.toUnicode("xn--wgvaaaaaaaaaaaaaaaaaaaaaaaa295fbabbbbbbbbbbbbbbbbbbbbbbb04837bcaccccccccccccccccccccccc")
+        }
+    }
+
+    @Test
+    func `RFC 5891 §5.3: ToUnicode accepts a canonical A-label in mixed case`() throws {
+        #expect(try IDNA.toUnicode("Xn--Mnchen-3ya") == "münchen")
+    }
+
+    @Test
     func `RFC 5890 §2.3.2.1: ToASCII yields the same A-label for canonically equivalent U-labels`() throws {
         let precomposed = try IDNA.toASCII("\u{03B5}\u{03BB}\u{03BB}\u{03AC}\u{03B4}\u{03B1}")
         let decomposed = try IDNA.toASCII("\u{03B5}\u{03BB}\u{03BB}\u{03B1}\u{0301}\u{03B4}\u{03B1}")
