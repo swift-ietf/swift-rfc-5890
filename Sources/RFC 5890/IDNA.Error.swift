@@ -2,7 +2,7 @@ public import RFC_3492
 
 extension IDNA {
 
-    public enum Error: Swift.Error, Equatable {
+    public enum Error: Swift::Error, Equatable {
         case emptyLabel
         case labelTooLong
         case invalidLabel
