@@ -1,6 +1,6 @@
+import RFC_3492
 import Testing
 
-import RFC_3492
 @testable import RFC_5890
 
 extension IDNA {
@@ -252,7 +252,6 @@ extension IDNA.Test.`Edge Case` {
             try IDNA.toUnicode("example.com..")
         }
     }
-
 
     @Test
     func `ToASCII: Greek domain`() throws {
