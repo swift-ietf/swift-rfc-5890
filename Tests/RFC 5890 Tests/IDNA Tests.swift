@@ -3,7 +3,9 @@ import Testing
 
 @testable import RFC_5890
 
-extension IDNA {
+enum `IDNA Tests` {}
+
+extension `IDNA Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -12,7 +14,7 @@ extension IDNA {
     }
 }
 
-extension IDNA.Test.Unit {
+extension `IDNA Tests`.Test.Unit {
 
     @Test
     func `ToASCII: German domain`() throws {
@@ -172,7 +174,7 @@ extension IDNA.Test.Unit {
     }
 }
 
-extension IDNA.Test.`Edge Case` {
+extension `IDNA Tests`.Test.`Edge Case` {
 
     @Test
     func `RFC 5890 §2.3.2.1: ToUnicode checks the 63-octet A-label bound before decoding`() {
@@ -321,7 +323,7 @@ extension IDNA.Test.`Edge Case` {
     }
 }
 
-extension IDNA.Test.Integration {
+extension `IDNA Tests`.Test.Integration {
 
     @Test
     func `Round-trip: German`() throws {
