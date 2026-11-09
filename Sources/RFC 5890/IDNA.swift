@@ -87,7 +87,12 @@ extension IDNA {
             throw Error.invalidLabel
         }
 
-        let encoded = Punycode.encode(normalized)
+        let encoded: String
+        do throws(Punycode.Error) {
+            encoded = try Punycode.encode(normalized)
+        } catch {
+            throw Error.punycodeError(error)
+        }
 
         let aLabel = acePrefix + encoded
 
