@@ -7,6 +7,8 @@ extension IDNA {
     public static let acePrefix = "xn--"
 
     public static let maxLabelLength = 63
+
+    public static let maxNameLength = 253
 }
 
 extension IDNA {
@@ -20,16 +22,27 @@ extension IDNA {
             asciiLabels.append(asciiLabel)
         }
 
-        return asciiLabels.joined(separator: ".") + (isAbsolute ? "." : "")
+        let name = asciiLabels.joined(separator: ".")
+        guard name.utf8.count <= maxNameLength else {
+            throw Error.nameTooLong
+        }
+
+        return name + (isAbsolute ? "." : "")
     }
 
     public static func toUnicode(_ input: String) throws(Error) -> String {
         let (labels, isAbsolute) = split(input)
+        var asciiLabels: [String] = []
         var unicodeLabels: [String] = []
 
         for label in labels {
-            let unicodeLabel = try toLabelUnicode(String(label))
-            unicodeLabels.append(unicodeLabel)
+            let asciiLabel = try toLabelASCII(label.lowercased())
+            asciiLabels.append(asciiLabel)
+            unicodeLabels.append(try toLabelUnicode(asciiLabel))
+        }
+
+        guard asciiLabels.joined(separator: ".").utf8.count <= maxNameLength else {
+            throw Error.nameTooLong
         }
 
         return unicodeLabels.joined(separator: ".") + (isAbsolute ? "." : "")
@@ -59,7 +72,19 @@ extension IDNA {
             guard normalized.utf8.count <= maxLabelLength else {
                 throw Error.labelTooLong
             }
-            return normalized.lowercased()
+            let lowercased = normalized.lowercased()
+            if lowercased.hasPrefix(acePrefix) {
+                _ = try toLabelUnicode(lowercased)
+                return lowercased
+            }
+            guard isLDH(lowercased) else {
+                throw Error.invalidLabel
+            }
+            return lowercased
+        }
+
+        guard isValidULabel(normalized) else {
+            throw Error.invalidLabel
         }
 
         let encoded = Punycode.encode(normalized)
@@ -115,7 +140,46 @@ extension IDNA {
             return decoded
         }
 
+        guard isLDH(lowercased) else {
+            throw Error.invalidLabel
+        }
+
         return lowercased
+    }
+
+    private static func isLDH(_ label: String) -> Bool {
+        label.unicodeScalars.allSatisfy(isLetterDigitHyphen)
+            && !label.hasPrefix("-")
+            && !label.hasSuffix("-")
+    }
+
+    private static func isLetterDigitHyphen(_ scalar: Unicode.Scalar) -> Bool {
+        switch scalar {
+        case "a"..."z", "A"..."Z", "0"..."9", "-":
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static func isValidULabel(_ label: String) -> Bool {
+        let scalars = Array(label.unicodeScalars)
+        guard let first = scalars.first, let last = scalars.last else {
+            return false
+        }
+        guard first != "-", last != "-" else {
+            return false
+        }
+        guard scalars.count < 4 || scalars[2] != "-" || scalars[3] != "-" else {
+            return false
+        }
+        switch first.properties.generalCategory {
+        case .nonspacingMark, .spacingMark, .enclosingMark:
+            return false
+        default:
+            break
+        }
+        return scalars.allSatisfy { !$0.isASCII || isLetterDigitHyphen($0) }
     }
 }
 

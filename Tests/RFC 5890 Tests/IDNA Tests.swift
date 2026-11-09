@@ -256,6 +256,85 @@ extension `IDNA Tests`.Test.`Edge Case` {
     }
 
     @Test
+    func `RFC 5891 §5.4: ToASCII validates an A-label it is given`() throws {
+        #expect(try IDNA.toASCII("XN--MNCHEN-3YA.de") == "xn--mnchen-3ya.de")
+        #expect(throws: IDNA.Error.invalidLabel) {
+            try IDNA.toASCII("xn--abc-.example")
+        }
+        #expect(throws: IDNA.Error.invalidLabel) {
+            try IDNA.toASCII("xn--cafe-yvc.com")
+        }
+        #expect(throws: IDNA.Error.invalidACEPrefix) {
+            try IDNA.toASCII("xn--.example")
+        }
+        #expect(throws: IDNA.Error.punycodeError(.badInput)) {
+            try IDNA.toASCII("xn--invalid!!!")
+        }
+    }
+
+    @Test
+    func `RFC 5890 §2.3.1: ToASCII rejects an ASCII label outside the LDH rules`() {
+        for name in ["ex_ample.com", "-example.com", "example-.com", "exa mple.com", "example.c*m"] {
+            #expect(throws: IDNA.Error.invalidLabel, "\(name)") {
+                try IDNA.toASCII(name)
+            }
+        }
+    }
+
+    @Test
+    func `RFC 5890 §2.3.1: ToUnicode rejects an ASCII label outside the LDH rules`() {
+        for name in ["ex_ample.com", "-example.com", "example-.com"] {
+            #expect(throws: IDNA.Error.invalidLabel, "\(name)") {
+                try IDNA.toUnicode(name)
+            }
+        }
+    }
+
+    @Test
+    func `RFC 5891 §4.2.3.1: A U-label may not start or end with a hyphen or hold hyphens in positions 3 and 4`() {
+        for name in ["-münchen.de", "münchen-.de", "mü--nchen.de", "mün_chen.de"] {
+            #expect(throws: IDNA.Error.invalidLabel, "\(name)") {
+                try IDNA.toASCII(name)
+            }
+            #expect(throws: IDNA.Error.invalidLabel, "\(name)") {
+                try IDNA.toUnicode(name)
+            }
+        }
+    }
+
+    @Test
+    func `RFC 5891 §4.2.3.2: A U-label may not start with a combining mark`() {
+        #expect(throws: IDNA.Error.invalidLabel) {
+            try IDNA.toASCII("\u{0301}abcé.com")
+        }
+    }
+
+    @Test
+    func `RFC 1034 §3.1: A name is at most 253 octets in its ASCII form`() throws {
+        let label = String(repeating: "a", count: 63)
+        let longest = [label, label, label, String(repeating: "b", count: 61)].joined(separator: ".")
+        #expect(try IDNA.toASCII(longest) == longest)
+        #expect(try IDNA.toASCII(longest + ".") == longest + ".")
+        #expect(try IDNA.toUnicode(longest) == longest)
+        #expect(throws: IDNA.Error.nameTooLong) {
+            try IDNA.toASCII(longest + "b")
+        }
+        #expect(throws: IDNA.Error.nameTooLong) {
+            try IDNA.toUnicode(longest + "b")
+        }
+    }
+
+    @Test
+    func `RFC 1034 §3.1: ToUnicode measures a U-label by its A-label`() {
+        let label = String(repeating: "a", count: 63)
+        let name = [label, label, label, "münchen", String(repeating: "b", count: 50)].joined(separator: ".")
+        #expect(name.utf8.count <= IDNA.maxNameLength)
+        #expect(throws: IDNA.Error.nameTooLong) {
+            try IDNA.toUnicode(name)
+        }
+    }
+
+    @Test
     func `ToASCII: Greek domain`() throws {
         let input = "ελλάδα.gr"
         let expected = "xn--hxakic4aa.gr"

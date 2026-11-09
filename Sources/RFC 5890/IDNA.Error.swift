@@ -5,6 +5,7 @@ extension IDNA {
     public enum Error: Swift::Error, Equatable {
         case emptyLabel
         case labelTooLong
+        case nameTooLong
         case invalidLabel
         case punycodeError(Punycode.Error)
         case invalidACEPrefix
