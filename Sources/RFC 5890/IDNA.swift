@@ -153,18 +153,23 @@ extension IDNA {
     }
 
     private static func isLDH(_ label: String) -> Bool {
-        label.unicodeScalars.allSatisfy(isLetterDigitHyphen)
+        label.utf8.allSatisfy(isLetterDigitHyphen)
             && !label.hasPrefix("-")
             && !label.hasSuffix("-")
     }
 
-    private static func isLetterDigitHyphen(_ scalar: Unicode.Scalar) -> Bool {
-        switch scalar {
-        case "a"..."z", "A"..."Z", "0"..."9", "-":
+    private static func isLetterDigitHyphen(_ byte: UInt8) -> Bool {
+        switch byte {
+        case UInt8(ascii: "a")...UInt8(ascii: "z"), UInt8(ascii: "A")...UInt8(ascii: "Z"),
+            UInt8(ascii: "0")...UInt8(ascii: "9"), UInt8(ascii: "-"):
             return true
         default:
             return false
         }
+    }
+
+    private static func isLetterDigitHyphen(_ scalar: Unicode.Scalar) -> Bool {
+        scalar.isASCII && isLetterDigitHyphen(UInt8(scalar.value))
     }
 
     private static func isValidULabel(_ label: String) -> Bool {

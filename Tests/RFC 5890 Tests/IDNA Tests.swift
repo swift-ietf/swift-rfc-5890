@@ -227,7 +227,7 @@ extension `IDNA Tests`.Test.`Edge Case` {
     @Test
     func `RFC 5890 §2.3.2.1: ToUnicode output of an NFC A-label is in NFC`() throws {
         let unicode = try IDNA.toUnicode(IDNA.toASCII("cafe\u{0301}"))
-        #expect(Array(unicode.unicodeScalars) == Array("caf\u{00E9}".unicodeScalars))
+        #expect(Array(unicode.utf8) == Array("caf\u{00E9}".utf8))
     }
 
     @Test
